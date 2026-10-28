@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-<header><h1 style="margin:0;font-size:20px">Graficadora F1 · Regularidad y puntos acumulados</h1></header>
+@include('partials.menu')
 <main>
     <form method="GET" class="card">
         <label>Temporada
