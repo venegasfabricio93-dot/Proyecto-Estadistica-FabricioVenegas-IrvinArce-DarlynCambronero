@@ -63,6 +63,46 @@ class DatosAgrupados
         $desv = sqrt($varianza);
         $cv = $media != 0 ? $desv / $media * 100 : null;
 
+        // ---- Mediana: Me = Li + ((n/2 - F_ant) / f) * A ----
+        $mitad = $n / 2;
+        $mediana = null;
+        $medianaInfo = null;
+        foreach ($clases as $c) {
+            if ($c['menos_abs'] >= $mitad) {
+                $ancho = $c['real_sup'] - $c['real_inf'];
+                $fAnt = $c['menos_abs'] - $c['fi'];
+                $mediana = $c['real_inf'] + (($mitad - $fAnt) / $c['fi']) * $ancho;
+                $medianaInfo = [
+                    'clase' => $c['li'] . ' – ' . $c['ls'],
+                    'li' => $c['real_inf'], 'n2' => $mitad,
+                    'f_ant' => $fAnt, 'fi' => $c['fi'], 'ancho' => $ancho,
+                ];
+                break;
+            }
+        }
+
+        // ---- Moda: Mo = Li + (d1 / (d1 + d2)) * A ----
+        // Si hay varias clases con la frecuencia máxima, se calcula una moda por cada una.
+        $maxF = max(array_column($clases, 'fi'));
+        $ultimo = count($clases) - 1;
+        $modas = [];
+        foreach ($clases as $idx => $c) {
+            if ($c['fi'] !== $maxF) continue;
+
+            $prev = $idx > 0 ? $clases[$idx - 1]['fi'] : 0;
+            $next = $idx < $ultimo ? $clases[$idx + 1]['fi'] : 0;
+            $d1 = $c['fi'] - $prev;
+            $d2 = $c['fi'] - $next;
+            if ($d1 + $d2 === 0) continue; // sin moda definida en esta clase
+
+            $ancho = $c['real_sup'] - $c['real_inf'];
+            $modas[] = [
+                'clase' => $c['li'] . ' – ' . $c['ls'],
+                'li' => $c['real_inf'], 'd1' => $d1, 'd2' => $d2, 'ancho' => $ancho,
+                'moda' => $c['real_inf'] + ($d1 / ($d1 + $d2)) * $ancho,
+            ];
+        }
+
         return [
             'valores' => $valores, 'n' => $n,
             'min' => $min, 'max' => $max, 'rango' => $rango,
@@ -70,6 +110,8 @@ class DatosAgrupados
             'clases' => $clases,
             'sum_xf' => $sumXF, 'sum_x2f' => $sumX2F,
             'media' => $media, 'varianza' => $varianza, 'desv' => $desv, 'cv' => $cv,
+            'mediana' => $mediana, 'mediana_info' => $medianaInfo,
+            'modas' => $modas,
         ];
     }
 }

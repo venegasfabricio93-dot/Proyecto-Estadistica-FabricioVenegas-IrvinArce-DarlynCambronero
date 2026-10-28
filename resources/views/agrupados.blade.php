@@ -149,6 +149,54 @@
         </div>
 
         <div class="card wrap">
+            <h2>Medidas de tendencia central (datos agrupados)</h2>
+            <table>
+                <thead class="naranja"><tr>
+                    <th>Media aritmética</th><th>Mediana</th><th>Moda</th>
+                </tr></thead>
+                <tbody>
+                <tr class="formula">
+                    <td>X̄ = Σ xᵢ fᵢ / n</td>
+                    <td>Me = Lᵢ + [ (n/2 − F<sub>ant</sub>) / fᵢ ] · A</td>
+                    <td>Mo = Lᵢ + [ d₁ / (d₁ + d₂) ] · A</td>
+                </tr>
+                <tr class="formula">
+                    <td>
+                        X̄ = {{ $fmt($tabla['sum_xf'], 2) }} / {{ $tabla['n'] }}<br>
+                        X̄ = <span class="resultado">{{ $fmt($tabla['media'], 3) }}</span>
+                    </td>
+                    <td>
+                        @if($tabla['mediana_info'])
+                            @php $me = $tabla['mediana_info']; @endphp
+                            Clase mediana: {{ $me['clase'] }}<br>
+                            Me = {{ $fmt($me['li'], 1) }} + [ ({{ $fmt($me['n2'], 1) }} − {{ $me['f_ant'] }}) / {{ $me['fi'] }} ] · {{ $fmt($me['ancho'], 1) }}<br>
+                            Me = <span class="resultado">{{ $fmt($tabla['mediana'], 3) }}</span>
+                        @else
+                            —
+                        @endif
+                    </td>
+                    <td>
+                        @forelse($tabla['modas'] as $mo)
+                            <div style="margin-bottom:10px">
+                                Clase modal: {{ $mo['clase'] }}<br>
+                                Mo = {{ $fmt($mo['li'], 1) }} + [ {{ $mo['d1'] }} / ({{ $mo['d1'] }} + {{ $mo['d2'] }}) ] · {{ $fmt($mo['ancho'], 1) }}<br>
+                                Mo = <span class="resultado">{{ $fmt($mo['moda'], 3) }}</span>
+                            </div>
+                        @empty
+                            No hay una clase modal definida.
+                        @endforelse
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p style="font-size:13px;color:#6b7280;margin-bottom:0">
+                Lᵢ = límite real inferior de la clase; A = amplitud de la clase; F<sub>ant</sub> = frecuencia acumulada de la clase anterior;
+                d₁ = fᵢ − f<sub>anterior</sub>; d₂ = fᵢ − f<sub>siguiente</sub>.
+                Si hay varias clases con la frecuencia máxima, se muestra una moda por cada una (distribución multimodal).
+            </p>
+        </div>
+
+        <div class="card wrap">
             <h2>Variabilidad de datos agrupados</h2>
             <table>
                 <thead class="naranja"><tr>
